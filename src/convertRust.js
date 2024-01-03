@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 
 function ConvertRust() {
-    const [uploaded, setUploaded] = useState(false);
+    //const [uploaded, setUploaded] = useState(false);
     const [converted, setConverted] = useState(false);
     const [timePassed, setTimePassed] = useState(0);
 
@@ -20,7 +20,7 @@ function ConvertRust() {
           },
         })
         .then((response) => {
-          setUploaded(true);
+          //setUploaded(true);
         })
         .catch((error) => {
           console.log(error);
