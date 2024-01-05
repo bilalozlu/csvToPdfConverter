@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 
 function ConvertRust() {
-    //const [uploaded, setUploaded] = useState(false);
+    const [uploaded, setUploaded] = useState(false);
     const [converted, setConverted] = useState(false);
     const [timePassed, setTimePassed] = useState(0);
 
@@ -87,7 +87,7 @@ function ConvertRust() {
             {converted ? 
               <button onClick={() => handleFileDownload("http://localhost:3333/BNK3.pdf", "hello_world.pdf")}>Download file ↓</button>
               :
-              <button onClick={handleFileConvert}>Convert file</button>
+              <button onClick={handleFileConvert} disabled={false} >Convert file</button>
             }
             <p>{timePassed.toFixed(1)}</p>
         </div>

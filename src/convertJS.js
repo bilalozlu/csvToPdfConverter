@@ -3,11 +3,11 @@ import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 
 function ConvertJS() {
-    //const [uploaded, setUploaded] = useState(false);
+    const [uploaded, setUploaded] = useState(false);
     const [converted, setConverted] = useState(false);
     const [timePassed, setTimePassed] = useState(0);
 
-    let isProcessing = false
+    let isProcessing = false;
 
     const handleFileUpload = (event) => {
       const file = event.target.files[0];
@@ -20,7 +20,7 @@ function ConvertJS() {
           },
         })
         .then((response) => {
-          //setUploaded(true);
+          //isUploaded = true;
         })
         .catch((error) => {
           console.log(error);
@@ -87,7 +87,7 @@ function ConvertJS() {
             {converted ? 
               <button onClick={() => handleFileDownload("http://localhost:3333/BNK3.pdf", "hello_world.pdf")}>Download file ↓</button>
               :
-              <button onClick={handleFileConvert}>Convert file</button>
+              <button onClick={handleFileConvert} disabled={false}>Convert file</button>
             }
             <p>{timePassed.toFixed(1)}</p>
         </div>
