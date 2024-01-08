@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSV Reader</title>
+  </head>
+  <body>
+    <input type="file" id="fileInput" />
+    <script type="module">
+      // Load and run the WebAssembly module
+      import init, * as wasmModule from "./rustcsvpdf.js";
+      const run = async () => {
+        await init("./rustcsvpdf_bg.wasm");
+        window.wasmModule = wasmModule;
+        document
+          .getElementById("fileInput")
+          .addEventListener("change", async (event) => {
+            const fileInput = event.target;
+            const file = fileInput.files[0];
+            if (file) {
+              const content = await file.text();
+              const pdfData = wasmModule.entrypoint(content);
+
+              // Create a Blob from the PDF data
+              const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
+
+              // Create a data URL from the Blob
+              const pdfUrl = URL.createObjectURL(pdfBlob);
+
+              // Open the PDF in a new tab
+              window.open(pdfUrl, "_blank");
+            }
+          });
+      };
+
+      await run();
+
+      init();
+    </script>
+  </body>
+</html>
