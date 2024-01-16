@@ -1,96 +1,100 @@
-import './App.css';
-import axios from 'axios';
-import React, {useEffect, useState} from 'react';
+import "./App.css";
+import React, { useEffect, useState } from "react";
+import init, * as wasmModule from "./rustcsvpdf/rustcsvpdf.js";
 
 function ConvertRust() {
-    const [uploaded, setUploaded] = useState(false);
-    const [converted, setConverted] = useState(false);
-    const [timePassed, setTimePassed] = useState(0);
+  //const [uploaded, setUploaded] = useState(false);
+  const [converted, setConverted] = useState(false);
+  const [timePassed, setTimePassed] = useState(0);
+  const [fileContent, setFileContent] = useState(null);
+  const [pdfData, setPdfData] = useState(null);
 
-    let isProcessing = false
+  let isProcessing = false;
 
-    const handleFileUpload = (event) => {
-      const file = event.target.files[0];
-      const formData = new FormData();
-      formData.append("file", file);
-      axios
-        .post("http://localhost:3333/public", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          //setUploaded(true);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    const content = await file.text();
+    setFileContent(content);
+  };
 
-    function handleFileDownload(url, fileName) {
-      return axios({
-        url,
-        method: 'GET',
-        responseType: 'blob',
-      })
-        .then(response => {
-          const href = window.URL.createObjectURL(response.data);
-    
-          const anchorElement = document.createElement('a');
-    
-          anchorElement.href = href;
-          anchorElement.download = fileName;
-    
-          document.body.appendChild(anchorElement);
-          anchorElement.click();
-    
-          document.body.removeChild(anchorElement);
-          window.URL.revokeObjectURL(href);
-        })
-        .catch(error => {
-          console.log('error: ', error);
-        });
+  function handleFileDownload(url, fileName) {
+    const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
+
+    // opens the file on a new tab
+    // const pdfUrl = URL.createObjectURL(pdfBlob);
+    // window.open(pdfUrl, "_blank");
+
+    //downloads the file
+
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(pdfBlob);
+    link.download = "your_pdf_filename.pdf"; // Set the desired file name
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function handleFileConvert() {
+    const startTime = new Date();
+
+    //place converter code here
+    const convertedFileContent = wasmModule.entrypoint(fileContent);
+    setPdfData(convertedFileContent);
+    const endTime = new Date();
+    setConverted(true);
+
+    let timeDiff = endTime - startTime;
+
+    console.log("Conversion took " + timeDiff / 1000 + " seconds with rust.");
+  }
+
+  function measureTime() {
+    if (isProcessing) setTimePassed((timePassed) => timePassed + 0.1);
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => measureTime(), 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const run = async () => {
+    await init("./rustcsvpdf_bg.wasm");
+    window.wasmModule = wasmModule;
+  };
+
+  useEffect(() => {
+    async function initializeWasmModule() {
+      await run();
+      init();
+      console.log("wasm module is ready");
     }
-
-    function handleFileConvert() {
-        isProcessing = true;
-
-
-        //place converter code here
-        setTimeout(() => {
-            console.log("done");
-            setConverted(true);
-            isProcessing = false;
-      }, 3000);
-    }
-
-    function measureTime() {
-      if (isProcessing)
-        setTimePassed((timePassed) => timePassed + 0.1)
-    }
-
-    useEffect(() => {
-      const interval = setInterval(() => 
-        measureTime()
-      , 100);
-    
-      return () => clearInterval(interval);
-    }, []);
+    initializeWasmModule();
+  }, []);
 
   return (
     <div className="App">
-        <div className="rust">
-            <p>convert with rust</p>
-            <label>
-              <input type="file" onChange={handleFileUpload} />
-            </label>
-            {converted ? 
-              <button onClick={() => handleFileDownload("http://localhost:3333/BNK3.pdf", "hello_world.pdf")}>Download file ↓</button>
-              :
-              <button onClick={handleFileConvert} disabled={false} >Convert file</button>
+      <div className="rust">
+        <p>convert with rust</p>
+        <label>
+          <input type="file" onChange={handleFileUpload} />
+        </label>
+        {converted ? (
+          <button
+            onClick={() =>
+              handleFileDownload(
+                "http://localhost:3333/BNK3.pdf",
+                "hello_world.pdf"
+              )
             }
-            <p>{timePassed.toFixed(1)}</p>
-        </div>
+          >
+            Download file ↓
+          </button>
+        ) : (
+          <button onClick={handleFileConvert}>Convert file</button>
+        )}
+        <p>{timePassed.toFixed(1)}</p>
+      </div>
     </div>
   );
 }

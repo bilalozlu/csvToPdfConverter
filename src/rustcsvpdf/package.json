@@ -1,0 +1,14 @@
+{
+  "name": "rustcsvpdf",
+  "version": "0.1.0",
+  "files": [
+    "rustcsvpdf_bg.wasm",
+    "rustcsvpdf.js",
+    "rustcsvpdf.d.ts"
+  ],
+  "module": "rustcsvpdf.js",
+  "types": "rustcsvpdf.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
