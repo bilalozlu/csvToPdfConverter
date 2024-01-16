@@ -1,56 +1,29 @@
 import "./App.css";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 function ConvertJS() {
   const [uploaded, setUploaded] = useState(false);
   const [converted, setConverted] = useState(false);
   const [timePassed, setTimePassed] = useState(0);
 
-  let isProcessing = false;
+  const isProcessing = useRef(false);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append("file", file);
-    axios
-      .post("http://localhost:3333/public", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        //isUploaded = true;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
-  function handleFileDownload(url, fileName) {
-    return axios({
-      url,
-      method: "GET",
-      responseType: "blob",
-    })
-      .then((response) => {
-        const href = window.URL.createObjectURL(response.data);
-
-        const anchorElement = document.createElement("a");
-
-        anchorElement.href = href;
-        anchorElement.download = fileName;
-
-        document.body.appendChild(anchorElement);
-        anchorElement.click();
-
-        document.body.removeChild(anchorElement);
-        window.URL.revokeObjectURL(href);
-      })
-      .catch((error) => {
-        console.log("error: ", error);
-      });
-  }
+  const handleFileDownload = () => {
+    //   const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
+    //   const link = document.createElement("a");
+    //   link.href = window.URL.createObjectURL(pdfBlob);
+    //   link.download = "your_pdf_filename.pdf"; // Set the desired file name
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+  };
 
   function convertCsvToPdf() {
     const csvFileInput = document.getElementById("csvFileInput");
@@ -65,9 +38,10 @@ function ConvertJS() {
     const csvFile = csvFileInput.files[0];
 
     // Use PapaParse to parse CSV to JSON
-    Papa.parse(csvFile, {
+    window.Papa.parse(csvFile, {
       complete: function (result) {
         const data = result.data;
+        console.time();
 
         // Create a PDF document
         const pdf = new window.jspdf.jsPDF();
@@ -108,6 +82,7 @@ function ConvertJS() {
             startY += 9.9;
           });
         }
+        console.timeEnd();
 
         // Save the PDF
         pdf.save("hello_world.pdf");
@@ -116,24 +91,18 @@ function ConvertJS() {
   }
 
   function handleFileConvert() {
-    isProcessing = true;
-
+    isProcessing.current = true;
     //place converter code here
-
     convertCsvToPdf();
-    setTimeout(() => {
-      console.log("done");
-      setConverted(true);
-      isProcessing = false;
-    }, 3000);
+    isProcessing.current = false;
   }
 
   function measureTime() {
-    if (isProcessing) setTimePassed((timePassed) => timePassed + 0.1);
+    if (isProcessing.current) setTimePassed((timePassed) => timePassed + 0.001);
   }
 
   useEffect(() => {
-    const interval = setInterval(() => measureTime(), 100);
+    const interval = setInterval(() => measureTime(), 1);
 
     return () => clearInterval(interval);
   }, []);
@@ -161,7 +130,7 @@ function ConvertJS() {
             Convert file
           </button>
         )}
-        <p>{timePassed.toFixed(1)}</p>
+        <p>{timePassed.toFixed(4)}</p>
       </div>
     </div>
   );
