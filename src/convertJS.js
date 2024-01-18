@@ -3,7 +3,6 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 
 function ConvertJS() {
-  const [uploaded, setUploaded] = useState(false);
   const [converted, setConverted] = useState(false);
   const [timePassed, setTimePassed] = useState(0);
 
@@ -92,7 +91,6 @@ function ConvertJS() {
 
   function handleFileConvert() {
     isProcessing.current = true;
-    //place converter code here
     convertCsvToPdf();
     isProcessing.current = false;
   }
@@ -130,7 +128,7 @@ function ConvertJS() {
             Convert file
           </button>
         )}
-        <p>{timePassed.toFixed(4)}</p>
+        <p>{timePassed.toFixed(3)}</p>
       </div>
     </div>
   );

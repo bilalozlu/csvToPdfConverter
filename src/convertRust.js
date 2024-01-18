@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import init, * as wasmModule from "./rustcsvpdf/rustcsvpdf.js";
 
 function ConvertRust() {
-  //const [uploaded, setUploaded] = useState(false);
   const [converted, setConverted] = useState(false);
   const [timePassed, setTimePassed] = useState(0);
   const [fileContent, setFileContent] = useState(null);
@@ -36,7 +35,6 @@ function ConvertRust() {
 
   async function handleFileConvert() {
     isProcessing.current = true;
-    //place converter code here
     // console.time();
     const convertedFileContent = wasmModule.entrypoint(fileContent);
     // console.timeEnd();
