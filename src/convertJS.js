@@ -66,13 +66,13 @@ function ConvertJS() {
 
     function measureTime() {
       if (isProcessing)
-        setTimePassed((timePassed) => timePassed + 0.1)
+        setTimePassed((timePassed) => timePassed + 0.001)
     }
 
     useEffect(() => {
       const interval = setInterval(() => 
         measureTime()
-      , 100);
+      , 1);
     
       return () => clearInterval(interval);
     }, []);
@@ -89,7 +89,7 @@ function ConvertJS() {
               :
               <button onClick={handleFileConvert} disabled={false}>Convert file</button>
             }
-            <p>{timePassed.toFixed(1)}</p>
+            <p>{timePassed.toFixed(3)}</p>
         </div>
     </div>
   );

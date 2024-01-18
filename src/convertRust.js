@@ -49,11 +49,11 @@ function ConvertRust() {
   }
 
   function measureTime() {
-    if (isProcessing) setTimePassed((timePassed) => timePassed + 0.1);
+    if (isProcessing) setTimePassed((timePassed) => timePassed + 0.001);
   }
 
   useEffect(() => {
-    const interval = setInterval(() => measureTime(), 100);
+    const interval = setInterval(() => measureTime(), 1);
 
     return () => clearInterval(interval);
   }, []);
@@ -93,7 +93,7 @@ function ConvertRust() {
         ) : (
           <button onClick={handleFileConvert}>Convert file</button>
         )}
-        <p>{timePassed.toFixed(1)}</p>
+        <p>{timePassed.toFixed(3)}</p>
       </div>
     </div>
   );
