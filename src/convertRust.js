@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import init, * as wasmModule from "./rustcsvpdf/rustcsvpdf.js";
 
 function ConvertRust() {
@@ -9,7 +9,7 @@ function ConvertRust() {
   const [fileContent, setFileContent] = useState(null);
   const [pdfData, setPdfData] = useState(null);
 
-  let isProcessing = false;
+  const isProcessing = useRef(false);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -34,22 +34,22 @@ function ConvertRust() {
     document.body.removeChild(link);
   }
 
-  function handleFileConvert() {
-    const startTime = new Date();
-
+  async function handleFileConvert() {
+    isProcessing.current = true;
     //place converter code here
+    // console.time();
     const convertedFileContent = wasmModule.entrypoint(fileContent);
+    // console.timeEnd();
     setPdfData(convertedFileContent);
-    const endTime = new Date();
     setConverted(true);
 
-    let timeDiff = endTime - startTime;
-
-    console.log("Conversion took " + timeDiff / 1000 + " seconds with rust.");
+    // let timeDiff = endTime - startTime;
+    isProcessing.current = false;
+    // console.log("Conversion took " + timeDiff / 1000 + " seconds with rust.");
   }
 
   function measureTime() {
-    if (isProcessing) setTimePassed((timePassed) => timePassed + 0.001);
+    if (isProcessing.current) setTimePassed((timePassed) => timePassed + 0.001);
   }
 
   useEffect(() => {
@@ -66,7 +66,7 @@ function ConvertRust() {
   useEffect(() => {
     async function initializeWasmModule() {
       await run();
-      init();
+      // init();
       console.log("wasm module is ready");
     }
     initializeWasmModule();
