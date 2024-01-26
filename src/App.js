@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <div className="exampleCSV-area">
-        <a href={process.env.PUBLIC_URL + "/example.csv"}>
+        <a href={"/example.csv"}>
           Download example CSV ↓
         </a>
       </div>

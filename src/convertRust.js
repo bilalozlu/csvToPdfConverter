@@ -27,7 +27,7 @@ function ConvertRust() {
 
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(pdfBlob);
-    link.download = "your_pdf_filename.pdf"; // Set the desired file name
+    link.download = "rust-result"; // Set the desired file name
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -35,9 +35,11 @@ function ConvertRust() {
 
   async function handleFileConvert() {
     isProcessing.current = true;
-    // console.time();
+    const startTime = new Date().getTime();
     const convertedFileContent = wasmModule.entrypoint(fileContent);
-    // console.timeEnd();
+    const endTime = new Date().getTime();
+    const timeDiff = endTime - startTime; //in ms,
+    setTimePassed(timeDiff);
     setPdfData(convertedFileContent);
     setConverted(true);
 
@@ -45,16 +47,6 @@ function ConvertRust() {
     isProcessing.current = false;
     // console.log("Conversion took " + timeDiff / 1000 + " seconds with rust.");
   }
-
-  function measureTime() {
-    if (isProcessing.current) setTimePassed((timePassed) => timePassed + 0.005);
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => measureTime(), 5);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const run = async () => {
     await init("./rustcsvpdf_bg.wasm");
@@ -73,24 +65,18 @@ function ConvertRust() {
   return (
     <div className="App">
       <div className="rust">
-        <p>convert with rust</p>
+        <img src="/rust.png" alt="Rust logo" height={150} />
         <label>
           <input type="file" onChange={handleFileUpload} />
+          {converted ? (
+            <button onClick={() => handleFileDownload("hello_world.pdf")}>
+              Download file ↓
+            </button>
+          ) : (
+            <button onClick={handleFileConvert}>Convert file</button>
+          )}
         </label>
-        {converted ? (
-          <button
-            onClick={() =>
-              handleFileDownload(
-                "hello_world.pdf"
-              )
-            }
-          >
-            Download file ↓
-          </button>
-        ) : (
-          <button onClick={handleFileConvert}>Convert file</button>
-        )}
-        <p>{timePassed.toFixed(4)}</p>
+        <p>{timePassed} ms</p>
       </div>
     </div>
   );

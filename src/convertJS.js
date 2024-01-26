@@ -79,11 +79,11 @@ function ConvertJS() {
   return (
     <div className="App">
       <div className="js">
-        <p>convert with js</p>
+        <img src="/js.png" alt="JS logo" height={150} />
         <label>
           <input type="file" id="csvFileInput" onChange={handleFileUpload} />
+          <button onClick={convertCsvToPdf}>Convert file</button>
         </label>
-        <button onClick={convertCsvToPdf}>Convert file</button>
         <p>{timePassed} ms</p>
       </div>
     </div>
