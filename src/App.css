@@ -2,6 +2,12 @@
   text-align: center;
 }
 
+.exampleCSV-area {
+  position: absolute;
+  left: 3vw;
+  top: 3vh
+}
+
 .App-header {
   background-image: url("../public/background.png");
   background-position: center;

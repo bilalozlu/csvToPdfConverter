@@ -81,7 +81,6 @@ function ConvertRust() {
           <button
             onClick={() =>
               handleFileDownload(
-                "http://localhost:3333/BNK3.pdf",
                 "hello_world.pdf"
               )
             }
