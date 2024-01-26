@@ -1,26 +1,13 @@
+import React, { useState } from "react";
 import "./App.css";
-import React, { useEffect, useRef, useState } from "react";
 
 function ConvertJS() {
-  const [converted, setConverted] = useState(false);
   const [timePassed, setTimePassed] = useState(0);
-
-  const isProcessing = useRef(false);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append("file", file);
-  };
-
-  const handleFileDownload = () => {
-    //   const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
-    //   const link = document.createElement("a");
-    //   link.href = window.URL.createObjectURL(pdfBlob);
-    //   link.download = "your_pdf_filename.pdf"; // Set the desired file name
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
   };
 
   function convertCsvToPdf() {
@@ -39,7 +26,7 @@ function ConvertJS() {
     window.Papa.parse(csvFile, {
       complete: function (result) {
         const data = result.data;
-        console.time();
+        const startTime = new Date().getTime();
 
         // Create a PDF document
         const pdf = new window.jspdf.jsPDF();
@@ -80,29 +67,14 @@ function ConvertJS() {
             startY += 9.9;
           });
         }
-        console.timeEnd();
+        const endTime = new Date().getTime();
+        const timeDiff = endTime - startTime; //in ms,
+        setTimePassed(timeDiff);
 
-        // Save the PDF
-        pdf.save("hello_world.pdf");
+        pdf.save("js-result.pdf");
       },
     });
   }
-
-  function handleFileConvert() {
-    isProcessing.current = true;
-    convertCsvToPdf();
-    isProcessing.current = false;
-  }
-
-  function measureTime() {
-    if (isProcessing.current) setTimePassed((timePassed) => timePassed + 0.005);
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => measureTime(), 5);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="App">
@@ -111,22 +83,8 @@ function ConvertJS() {
         <label>
           <input type="file" id="csvFileInput" onChange={handleFileUpload} />
         </label>
-        {converted ? (
-          <button
-            onClick={() =>
-              handleFileDownload(
-                "randommmmm.pdf"
-              )
-            }
-          >
-            Download file ↓
-          </button>
-        ) : (
-          <button onClick={handleFileConvert} disabled={false}>
-            Convert file
-          </button>
-        )}
-        <p>{timePassed.toFixed(4)}</p>
+        <button onClick={convertCsvToPdf}>Convert file</button>
+        <p>{timePassed} ms</p>
       </div>
     </div>
   );
